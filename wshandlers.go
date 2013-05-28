@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-// STARTWGINIT OMIT
 type wordgame struct {
 	ws     *websocket.Conn
 	send   chan []byte
@@ -30,9 +29,6 @@ func (wg *wordgame) Cleanup() {
 	wg.ws.Close()
 }
 
-// ENDWGINIT OMIT
-
-// STARTRP OMIT
 func (wg *wordgame) ReadPump() {
 	for {
 		switch wg.finish {
@@ -58,9 +54,6 @@ func (wg *wordgame) ReadPump() {
 	}
 }
 
-// ENDRP OMIT
-
-// STARTWP OMIT
 func (wg *wordgame) WritePump() {
 	ticker := time.NewTicker(4 * time.Second)
 	defer ticker.Stop()
@@ -86,9 +79,6 @@ func (wg *wordgame) WritePump() {
 	}
 }
 
-// ENDWP OMIT
-
-// STARTWRITE OMIT
 func (wg *wordgame) write(opCode int, payload []byte) error {
 	wg.ws.SetWriteDeadline(time.Now().Add(30 * time.Second))
 	w, err := wg.ws.NextWriter(opCode)
@@ -102,4 +92,3 @@ func (wg *wordgame) write(opCode int, payload []byte) error {
 	return w.Close()
 }
 
-// ENDWRITE OMIT

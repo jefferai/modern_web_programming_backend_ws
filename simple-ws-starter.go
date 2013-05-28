@@ -12,7 +12,6 @@ const (
 	bufsize int = 16384
 )
 
-// STARTWSUP OMIT
 func serveWs(w http.ResponseWriter, r *http.Request) {
 	// Disallow anything other than GETs
 	if r.Method != "GET" {
@@ -28,15 +27,12 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request", 400)
 		return
 	}
-// ENDWSUP OMIT
 
-//STARTRWSTART OMIT
 	wordgame := NewWordGame(ws)
 
 	defer wordgame.Cleanup()
 	go wordgame.WritePump()
 	wordgame.ReadPump()
-//ENDRWSTART OMIT
 }
 
 func sigintCatcher() {

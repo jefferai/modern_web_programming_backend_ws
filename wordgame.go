@@ -34,7 +34,6 @@ func UnhideByte(guess byte, word string, maskedword string) string {
 	return string(maskedwordbytes)
 }
 
-// STARTWGMNG OMIT
 func (wg *wordgame) makeNewGame() int64 {
 
 	// skipping some error handling for presentation reasons
@@ -56,8 +55,38 @@ func (wg *wordgame) makeNewGame() int64 {
 func (wg *wordgame) removeGame() {
 	delete(games, wg.gameId)
 }
-// ENDWGMNG OMIT
 
 func (wg *wordgame) processMessage(reader io.Reader) {
+	// In practice you will often want to use a LimitedReader to protect against malicious/bad inputs
+	message, err := ioutil.ReadAll(reader)
+	if err != nil || len(message) == 0 {
+		return
+	}
+
+	stringMsg := strings.TrimSpace(string(message))
+	
+	if len(stringMsg) == 0 {
+		wg.send <- []byte("You need to give me something to work with, here...\n")
+		return
+	}
+
+	game := games[wg.gameId]
+	game.NumGuesses++
+
+  if len(stringMsg) > 1 { //it's a guess at the word, not a new character
+		if stringMsg == game.Word {
+			// FIXME:
+			// 1) Tell the player they got it
+			// 2) Tell the writer to close the connection
+		} else {
+			// FIXME: Tell the player they didn't get it
+		}
+		return
+	}
+
+	game.MaskedWord = UnhideByte(stringMsg[0], game.Word, game.MaskedWord)
+	games[wg.gameId] = game
+	wg.send <- []byte("Number of guesses: " + strconv.Itoa(int(game.NumGuesses)) + "\n")
+  wg.send <- []byte("Current word: " + game.MaskedWord + "\n")
 	return
 }
